@@ -8,11 +8,13 @@
 
 <body>
     <a href='fane.html'>fane</a>
-    <form>
-        Username<input type="text" id="userName" name="year" value="" />
-        Password<input type="password" id="password" name="month" value="" />
-        Image<input type="file" name="image" />
-        <input type="submit" id="submit" value="Submit" />
+    <form action='/produs/adaugare' method="POST" enctype="multipart/form-data">
+        denumire<input type="text" id="userName" value="" />
+        specificatii<input type="text" id="specificatiiMinime" value="" />
+        descriere<input type="text" id="descriere" value="" />
+        pret<input type="number" id="pret" value="" />
+        Image<input type="file" name="image" id="image" />
+        <input type="button" id="submit" value="Submit" />
     </form>
-
+    <script src="./index.js"></script>
 </body>

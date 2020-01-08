@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT
         },
         poza: {
-            type: DataTypes.BLOB
+            type: DataTypes.STRING
         },
         eActivat: {
             type: DataTypes.BOOLEAN,
