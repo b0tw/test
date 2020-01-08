@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BLOB
         },
         eActivat: {
-            type: DataTypes.BOOL,
+            type: DataTypes.BOOLEAN,
             defaultValue: false
         }
     }, { updatedAt: false, createdAt: false })

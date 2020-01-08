@@ -37,7 +37,7 @@ passport.deserializeUser(function (id, cb) {
   cb(null, user);
 });
 
-const db = require('./sequelize');
+const db = require('./sequelize').default;
 
 // Create a new Express application.
 var app = express();
@@ -70,16 +70,40 @@ app.get('/logout', connect.ensureLoggedIn('/login'), (req, res) => {
   req.logout();
   res.status(200).send({ message: "You've been logged out" });
 })
-
-app.post('/comenzi', (req, res) => {
+app.post('/comenzi/adaugare', (req, res) => {
   const Comenzi = require('./models').Comenzi;
+
+  const name = req.body.name;
+  const location = req.body.location;
+  const noProducts = req.body.noProducts;
+  const totalSum = req.body.totalSum;
   const date = req.body.date;
-  const op = require('sequelize').Op;
+
+  const comanda = {
+    name,
+    location,
+    noProducts,
+    totalSum,
+    date
+  }
+  Comenzi.create(comanda).then(() => {
+    res.status(200).send({ message: "Comanda inregistrata" });
+  }).catch(() => {
+    res.status(500).send({ message: "cOmanda" });
+  })
+
+})
+app.post('/comenzi/afisare', (req, res) => {
+  const Comenzi = require('./models').Comenzi;
+  const dateInit = req.body.dateInit;
+  const dateFin = req.body.dateFin;
+  const sequelize = require('sequelize');
+  const op = sequelize.Op;
 
   Comenzi.findAll({
     where: {
       date: {
-        [op.lt]: sequelize.col('date')
+        [op.between]: [dateInit, dateFin]
       }
     },
     order: [['date', 'DESC']]
@@ -90,16 +114,48 @@ app.post('/comenzi', (req, res) => {
   })
 });
 
-app.get('/comenzi', (req, res) => {
+app.post('/recenzii/adaugare', (req, res) => {
+  const Recenzii = require('./models').Recenzii;
+  const recenzie = { recenzie: req.body.recenzie };
+
+  Recenzii.create(recenzie).then(() => {
+    res.status(200).send({ message: "Recenzie inregistrata" });
+  }).catch(() => {
+    res.status(500).send({ message: "Recenzia nu a fost incarcata" })
+  })
+})
+
+app.get('/recenzii/afisare', (req, res) => {
   const Recenzii = require('./models').Recenzii;
   Recenzii.findAll().then((recenzii) => {
-    res.status(200).send(recenzii).redirect('/');
+    res.status(200).send(recenzii);
   }).catch(() => {
     res.status(500).send({ message: "Eroare la db" })
   })
 });
+const multer = require('multer');
+const upload = multer({ dest: './uploads' });
 
 app.post('/produse/adaugare', (req, res) => {
+  const Produse = require('./models').Produse;
+
+  const denumire = req.body.denumire;
+  const specificatiiMinime = req.body.specificatiiMinime;
+  const pret = req.body.pret;
+  const descriere = req.body.descriere;
+
+
+  const produs = {
+    denumire,
+    specificatiiMinime,
+    pret,
+    descriere
+  }
+  Produse.create(produs).then(() => {
+    res.status(200).send({ message: "Ruesit" });
+  }).catch(() => {
+    res.status(500).send({ message: "Fail" });
+  })
 
 });
 
@@ -122,6 +178,19 @@ app.get('/produse/afisare', (req, res) => {
     res.status(500).send({ message: "Eroare la db" });
   })
 })
+
+app.get('/reset', (req, res) => {
+  const connection = require('./models').connection;
+
+  connection.sync({ force: true }).then(
+    () => {
+      res.status(200).send({ message: "Database reset" })
+    }).catch(
+      () => {
+        res.status(500).send({ message: "Database reset error" }
+        )
+      })
+});
 
 app.use(express.static(__dirname + '/views'));
 
