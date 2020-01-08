@@ -60,16 +60,15 @@ app.use(passport.session());
 
 // Define routes.
 
-app.post('/login',
-  passport.authenticate('local'),
-  async (req, res) => {
-    res.status(200).send({ message: "Logare reusita" });
-  });
+app.post('/login', passport.authenticate('local'), async (req, res) => {
+  res.status(200).send({ message: "Logare reusita" });
+});
 
 app.get('/logout', connect.ensureLoggedIn('/login'), (req, res) => {
   req.logout();
   res.status(200).send({ message: "You've been logged out" });
-})
+});
+
 app.post('/comenzi/adaugare', (req, res) => {
   const Comenzi = require('./models').Comenzi;
 
@@ -92,7 +91,8 @@ app.post('/comenzi/adaugare', (req, res) => {
     res.status(500).send({ message: "cOmanda" });
   })
 
-})
+});
+
 app.post('/comenzi/afisare', (req, res) => {
   const Comenzi = require('./models').Comenzi;
   const dateInit = req.body.dateInit;
@@ -123,7 +123,7 @@ app.post('/recenzii/adaugare', (req, res) => {
   }).catch(() => {
     res.status(500).send({ message: "Recenzia nu a fost incarcata" })
   })
-})
+});
 
 app.get('/recenzii/afisare', (req, res) => {
   const Recenzii = require('./models').Recenzii;
@@ -133,8 +133,15 @@ app.get('/recenzii/afisare', (req, res) => {
     res.status(500).send({ message: "Eroare la db" })
   })
 });
+
 const multer = require('multer');
-const upload = multer({ dest: './uploads' });
+let storage = multer.diskStorage({
+  destination: './uploads',
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  }
+})
+const upload = multer({ storage: storage });
 
 app.post('/produse/adaugare', upload.single('image'), (req, res) => {
   const Produse = require('./models').Produse;
@@ -144,7 +151,6 @@ app.post('/produse/adaugare', upload.single('image'), (req, res) => {
   const pret = req.body.pret;
   const descriere = req.body.descriere;
   const poza = req.file.path;
-
   const produs = {
     denumire,
     specificatiiMinime,
@@ -196,7 +202,7 @@ app.get('/produse/afisare', (req, res) => {
   }).catch(() => {
     res.status(500).send({ message: "Eroare la db" });
   })
-})
+});
 
 app.get('/reset', (req, res) => {
   const connection = require('./models').connection;
