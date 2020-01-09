@@ -221,5 +221,5 @@ app.use(express.static(__dirname + '/views'));
 
 
 app.listen(3000, "127.0.0.1", function () {
-  console.log("Server is listening on localhost");
+  console.log("Server is listening on http://localhost:3000");
 });
